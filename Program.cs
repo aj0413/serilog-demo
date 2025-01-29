@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Context;
 using serilog_demo;
 
 // Creates initial ReloadableLogger for use before access to configuration or services
@@ -101,6 +102,8 @@ try
         // Replaces the default implementation, thus losing all other log providers registered normally, unless writeToProviders: true
         ILoggerFactory loggerFactory) =>
     {
+        using var ctx = LogContext.PushProperty("TestLog", true);
+
         normalLogger.LogInformation("DI => ILogger<Program> runtime type: {type}", normalLogger.GetType());
 
         var factoryLogger = loggerFactory.CreateLogger<Program>();
