@@ -3,9 +3,19 @@
 GET {{serilog_demo_HostAddress}}/weatherforecast
 Accept: application/json
 
-###å
+###
 
 GET {{serilog_demo_HostAddress}}/weatherforecast?summary=Chilly
+Accept: application/json
+
+###
+
+POST  {{serilog_demo_HostAddress}}/throw-error
+Accept: application/json
+
+###
+
+POST  {{serilog_demo_HostAddress}}/test-loggers
 Accept: application/json
 
 ###
