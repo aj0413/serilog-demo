@@ -9,6 +9,7 @@ This should (hoepfully) cover most normal topics and use-cases.
 There's actually multiple ways to register serilog. Depending on the intention:
 
 - [Only Log Provider](#serilog-as-the-sole-log-provider-at-runtime)
+- [As 1 of N Log Providers](#serilog-as-one-of-n-log-providers)
 
 ### Serilog as the sole log provider at runtime.
 

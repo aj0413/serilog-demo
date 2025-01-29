@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using serilog_demo;
@@ -42,9 +41,20 @@ try
         //  Otherwise, Serilog will ignore all other providers
         writeToProviders: false);
 
+    var efLogger = new LoggerConfiguration()
+                    .WriteTo.File(
+                        path: "./logs/ef-core/log-.json",
+                        rollingInterval: RollingInterval.Day,
+                        formatter: new Serilog.Formatting.Compact.CompactJsonFormatter())
+                    .CreateLogger();
+
     builder.Services.AddDbContext<WeatherForecastContext>(options => 
-        // EnableSenstiveDataLogging isn't necessary here aside from making it query parameter values are actually shown in logs
-        options.UseSqlite($"Data Source=./weatherforecast.db").EnableSensitiveDataLogging()); 
+        options
+            .UseSqlite($"Data Source=./weatherforecast.db")
+            // EnableSenstiveDataLogging isn't necessary here aside from making it query parameter values are actually shown in logs
+            .EnableSensitiveDataLogging()
+            // Using created logger to capture logs from EF Core; unnecessary for the most part, however
+            .LogTo(msg => efLogger.Information(msg))); 
 
     // Adds Serilog along with other log providers
     // Notice logs will still go to console (add be formatted differently) because you're now using the default log providers+Serilog
@@ -86,17 +96,24 @@ try
 
     app.MapPost("/test-loggers", (
         ILogger<Program> normalLogger,
-        Serilog.ILogger serilogAbstractLogger) =>
+        Serilog.ILogger serilogAbstractLogger,
+        // ILoggerFactory registered by Serilog as SerilogLoggerFactory to handle all logs
+        // Replaces the default implementation, thus losing all other log providers registered normally, unless writeToProviders: true
+        ILoggerFactory loggerFactory) =>
     {
-        normalLogger.LogInformation("Testing {type} 1..2..3", normalLogger.GetType());
+        normalLogger.LogInformation("DI => ILogger<Program> runtime type: {type}", normalLogger.GetType());
 
-        serilogAbstractLogger.Information("Testing {type} 1..2..3", serilogAbstractLogger.GetType());
+        var factoryLogger = loggerFactory.CreateLogger<Program>();
+
+        factoryLogger.LogInformation("ILoggerFactory.Create<Program> => ILogger<Program> runtime type: {type}", factoryLogger.GetType());
+
+        serilogAbstractLogger.Information("DI => Serilog.ILogger runtime type: {type}", serilogAbstractLogger.GetType());
 
         // This grabs the static/singleton Serilog.Log instance
         // See how the type changes based on preserveStaticLogger
         var staticLogger = Log.ForContext<Program>();
 
-        staticLogger.Information("Testing {type} 1..2..3", staticLogger.GetType());
+        staticLogger.Information("Log.ForContext<Program>() => Serilog.ILogger runtime type: {type}", staticLogger.GetType());
     });
 
     app.Run();
