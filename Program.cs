@@ -54,7 +54,7 @@ try
             // EnableSenstiveDataLogging isn't necessary here aside from making it query parameter values are actually shown in logs
             .EnableSensitiveDataLogging()
             // Using created logger to capture logs from EF Core; unnecessary for the most part, however
-            .LogTo(msg => efLogger.Information(msg))); 
+            .LogTo(msg => efLogger.Information("EfCore.LogTo: {msg}", msg))); 
 
     // Adds Serilog along with other log providers
     // Notice logs will still go to console (add be formatted differently) because you're now using the default log providers+Serilog
