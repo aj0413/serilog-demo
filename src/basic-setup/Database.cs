@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace serilog_demo;
@@ -30,4 +31,10 @@ public class WeatherForecastContext(DbContextOptions options) : DbContext(option
                 context.SaveChanges();
             });
     }
+}
+
+static class Extensions
+{
+    public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate) =>
+        condition ? query.Where(predicate) : query;
 }
