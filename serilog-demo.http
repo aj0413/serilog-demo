@@ -10,12 +10,7 @@ Accept: application/json
 
 ###
 
-POST  {{serilog_demo_HostAddress}}/throw-error
-Accept: application/json
-
-###
-
-POST  {{serilog_demo_HostAddress}}/test-loggers
+GET {{serilog_demo_HostAddress}}/weatherforecast?temperatureC=25
 Accept: application/json
 
 ###
