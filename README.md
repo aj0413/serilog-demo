@@ -1,73 +1,32 @@
-# Demo of using Serilog in .Net 9
+# Demo(s) of using Serilog in .Net 9
 
 This repository is to act as a learning tool and demo for Serilog and logging in general.
 
-This should (hoepfully) cover most normal topics and use-cases.
+This should (hopefully) cover most normal topics and use-cases.
 
-## Registering Serilog for use
+There's a few helpful demo projects under `src/*`; each should be aptly named towards what they're trying to teach.
 
-There's actually multiple ways to register serilog. Depending on the intention:
+Additionally, there's a write-ups of what each demo is trying to teach under `docs/*`, plus some extra.
 
-- [Only Log Provider](#serilog-as-the-sole-log-provider-at-runtime)
-- [As 1 of N Log Providers](#serilog-as-one-of-n-log-providers)
+## What's covered so far?
 
-### Serilog as the sole log provider at runtime.
+- [How does logging work?](docs/how-logging-works.md)
+- [Structured vs Unstructured Logs](docs/structured-vs-unstructured-logs.md)
+- [Log Enrichment](docs/log-enrichment.md)
+- [Log Filtering](docs/log-filtering.md)
+- [Basic Setup](docs/basic-setup.md#basic-setup)
+- [Appsettings Setup](docs/appsettings-setup.md#appsettings-setup)
+- [Boostrap Logger](docs/boostrap-logger.md#boostrap-logger)
+- [Custom Serilog Sinks](docs/custom-serilog-sinks.md)
+- [Conditional Serilog Sinks](docs/conditional-serilog-sinks.md)
+- [Additional Log Providers](docs/additional-log-providers.md#additional-log-providers)
 
-This is the normal and intended use-case for serilog. Generally speaking, you should be using Serilog.Sinks to log to different places as their equivalent.
+## Need more help?
 
-Confusingly, this two ways to do this at the moment.
+If there's something that docs+demos can't help you figure out or understand, do open an issue.
 
-If you're working in web app and are using  `WebApplication.CreateBuilder` then you have access to `IHostBuilder` via `builder.Host`:
+## Contributions
 
-```
-var builder = WebApplication.CreateBuilder(args);
+If you want to open a PR to add to this, feel free. This is going to be a sort-of 'living document' as it were.
 
-builder.Host.UseSerilog((host, lc) => lc
-    .ReadFrom.Configuration(builder.Configuration));
-```
-
-If you *don't* have access to `IHostBuilder`, such as a non-web app, then you need to do the following:
-
-```
-var builder = Host.CreateApplicationBuilder();
-
-builder.Services.AddSerilog((lc) => lc
-     .ReadFrom.Configuration(builder.Configuration));
-```
-
-Note, however, that the latter is actually an extension on `IServiceCollection` and can thus be called in both cases. Furthermore, the first example is just a thin wrapper over it. 
-
-This is why it's the new default in the documentation/examples.
-
-See:
-- [GitHub Issue: UseSerilog support for .net 7 CreateApplicationBuilder and HostApplicationBuilder](https://github.com/serilog/serilog/issues/1855)
-- [GitHub Issue: UseSerilog support for .net8 IHostApplicationBuilder](https://github.com/serilog/serilog-extensions-hosting/issues/76)
-
-Source code:
-- [IHostBuilder.UseSerilog](https://github.com/serilog/serilog-extensions-hosting/blob/87e316f7d31ae431747d1106976dfceffdecc32c/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs#L100)
-- [IServiceCollection.AddSerilog](https://github.com/serilog/serilog-extensions-hosting/blob/87e316f7d31ae431747d1106976dfceffdecc32c/src/Serilog.Extensions.Hosting/SerilogServiceCollectionExtensions.cs#L129)
-
-
-### Serilog as one of N log providers
-
-This is a more abnormal setup, but may come up if a ready Serilog.Sink does not exist for the service you wish to send logs to, but *does* have docs on registering a log provider.
-
-For instance, if you want to capture logs with [Application Insights](https://learn.microsoft.com/en-us/azure/azure-monitor/app/ilogger).
-
-```
-builder.Logging.AddApplicationInsights(
-        configureTelemetryConfiguration: (config) => 
-            config.ConnectionString = builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING"),
-            configureApplicationInsightsLoggerOptions: (options) => { }
-    );
-```
-
-In this case, you'd register Serilog via:
-
-```
-builder.Logging.AddSerilog(
-    new LoggerConfiguration()
-        .ReadFrom.Configuration(builder.Configuration)
-        .CreateLogger()
-    );
-```
+I think it'd be cool to have others add to it over time; just ask you follow the template stamped out, if you can.
