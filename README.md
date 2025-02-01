@@ -21,6 +21,18 @@ Additionally, there's a write-ups of what each demo is trying to teach under `do
 - [Conditional Serilog Sinks](docs/conditional-serilog-sinks.md)
 - [Additional Log Providers](docs/additional-log-providers.md#additional-log-providers)
 
+## Running the demos
+
+Everything under `src` is using the `Directory.Build.props` for universal config. The individual `*.csproj` files will only hold stuff specific to a demo.
+
+All projects make use of the `./weatherforecast.db` SQLite database file to act as backend for EF Core; shouldn't need to run migrations as the current saved file state is pre-seeded.
+
+There's a `serilog-demo.http` file for REST Client to make calls to endpoint(s).
+
+`.vscode/launch.json` comes pre-configured for running each demo using the `https` launchSettingsProfile.
+
+Color themes may or may not show depending on terminal you're outputting to; VS Code integrated Debug Console will ignore Serilog config for instance.
+
 ## Need more help?
 
 If there's something that docs+demos can't help you figure out or understand, do open an issue.
